@@ -4,44 +4,46 @@
   --color-tertiary: #9abd97;
   --color-accent: #646536;
   --color-text: #000000;
+
+  --viewport-base: calc((10vh + 10vw) / 2 * 0.2);
 }
 
-.main {
+.sidebar {
+  border-radius: var(--viewport-base);
+
+  font-family: "Roboto", sans-serif;
   width: 12vw;
   height: 100vh;
 
   display: flex;
   flex-direction: column;
   padding: 1vh;
+  align-items: center;
   /* justify-content: center; */
   color: var(--color-text);
   background-color: var(--color-secondary);
 
-  gap: 2vh; 
-}
-.main .logo{
-     align-self: center;
+  gap: 2vh;
 }
 
-.main img{
-    width: 30vh;
-    height: 30vh;
+.sidebar img {
+  width: 30vh;
+  height: 30vh;
 }
 
-.main .link{
-    display: flex;
-    align-items: center;
+.sidebar .link {
+  display: flex;
+  align-items: center;
 
-    gap: 1vw;
+  gap: 1vw;
 }
 
 a {
-  text-decoration: none;         /* Remove underline */
-  color: inherit;                /* Inherit text color (from parent, e.g., var(--color-text)) */
-  transition: all 0.2s ease;     /* Smooth hover effect */
+  text-decoration: none; /* Remove underline */
+  color: inherit; /* Inherit text color (from parent, e.g., var(--color-text)) */
+  transition: all 0.2s ease; /* Smooth hover effect */
 }
 
 a:hover {
-  text-decoration: underline;    /* Underline on hover */
+  text-decoration: underline; /* Underline on hover */
 }
-

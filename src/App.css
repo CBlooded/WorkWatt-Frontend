@@ -1,5 +1,5 @@
 :root {
-  --viewport-base: calc((10vh + 10vw)/2 * 0.25);
+  --viewport-base: calc((10vh + 10vw)/2 * 0.20);
 }
 
 html {
