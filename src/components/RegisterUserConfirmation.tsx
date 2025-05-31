@@ -1,9 +1,9 @@
 import { TextField, Button, Box, InputLabel } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import { useParams } from "react-router";
+import { useParams,useSearchParams } from "react-router";
 
 type tempRegTypes = {
   tempPassword: string;
@@ -19,34 +19,38 @@ const LoginForm = () => {
   } = useForm<tempRegTypes>();
 
   // check if hostId is correct
-  const [hostUUID, setHostUUID] = useState<string>("");
+  // const [hostUUID, setHostUUID] = useState<string>("");
   const params = useParams();
   const feedback = useRef<HTMLParagraphElement>(null);
-  let userConfirmed = false;
+  const userConfirmed = useRef<boolean>(false);
+  // let userConfirmed = false;
+
+  // searchParams
+    const [searchParams] = useSearchParams();
+    const h = searchParams.get("h");
 
   useEffect(() => {
-    setHostUUID(params.hostUUID || "");
+    // setHostUUID(params.h || "");
     try {
+
       const response = AxiosConfig.get(
         //TODO: change endpoint var
-        `/api/v1/account/confirm?hostId=${params.hostUUID}`
+        `/api/v1/account/confirm?h=${params.h}`
       );
-      // console.log(response);
       response
         .then(() => {
-          console.log(hostUUID);
-          feedback.current!.textContent = "";
-          userConfirmed = true;
+          feedback.current!.textContent = "user confirmed";
+          userConfirmed.current = true;
         })
         .catch((err) => {
           feedback.current!.textContent = "Error occured, no hostId";
-          console.log(err);
-          userConfirmed = false;
+          console.log("error: ",err);
+          userConfirmed.current = false;
         });
     } catch (error) {
       console.log(`error:${error}`);
     }
-  }, [params.hostUUID]);
+  }, [params.h]);
 
   const onSubmit = async (data: tempRegTypes) => {
     try {
