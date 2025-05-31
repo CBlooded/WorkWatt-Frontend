@@ -10,6 +10,7 @@ import { Route, Routes, BrowserRouter } from "react-router";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterForm from "./components/RegisterForm";
 import LoginPage from "./pages/LoginPage";
+import RegisterUser from "./components/RegisterUserConfirmation";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LoginPage />} />
+            <Route path="/account/confirm" element={<RegisterUser />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/tempRegister" />
               <Route path="/register" element={<RegisterForm />} />
