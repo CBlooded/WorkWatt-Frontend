@@ -6,9 +6,11 @@ import "./LoginPage.css";
 import image from '../resources/bulbIMG.png';
 import image2 from '../resources/hardwareIMG.png';
 import image3 from '../resources/green.png';
+import Navbar from '../components/navbar';
 
 const LoginPage = () => {
   return (<>
+    <Navbar />
     <div className="rowContainer">
       <div className="upperSection">
         <div className="loginContainer">
