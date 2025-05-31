@@ -9,17 +9,15 @@ import { Route, Routes } from "react-router";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterForm from "./components/RegisterForm";
 
-
 function App() {
   return (
     <>
       <div className="app">
-
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <ProtectedRoute>
             <Route path="/tempRegister" />
-            <Route path="/register" / element={<RegisterForm />}>
+            <Route path="/register" element={<RegisterForm />} />
             <Route path="/dashboard" />
           </ProtectedRoute>
         </Routes>
