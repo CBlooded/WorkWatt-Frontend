@@ -11,7 +11,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterForm from "./components/RegisterForm";
 import LoginPage from "./pages/LoginPage";
 import RegisterUser from "./components/RegisterUserConfirmation";
-import SingleUserChart from './components/SingleUserChart'
+// import SingleUserChart from './components/SingleUserChart'
+import UserStats from "./components/userStats";
 
 function App() {
   const role = 0;
@@ -25,6 +26,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/account/confirm" element={<RegisterUser />} />
+            <Route path="/userStats" element={<UserStats />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/tempRegister" />
               <Route path="/register" element={<RegisterForm />} />
