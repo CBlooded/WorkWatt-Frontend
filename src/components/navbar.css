@@ -1,0 +1,47 @@
+:root {
+  --color-primaty: #e8fff5;
+  --color-secondary: #d0f1bf;
+  --color-tertiary: #9abd97;
+  --color-accent: #646536;
+  --color-text: #000000;
+}
+
+.main {
+  width: 12vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  padding: 1vh;
+  /* justify-content: center; */
+  color: var(--color-text);
+  background-color: var(--color-secondary);
+
+  gap: 2vh; 
+}
+.main .logo{
+     align-self: center;
+}
+
+.main img{
+    width: 30vh;
+    height: 30vh;
+}
+
+.main .link{
+    display: flex;
+    align-items: center;
+
+    gap: 1vw;
+}
+
+a {
+  text-decoration: none;         /* Remove underline */
+  color: inherit;                /* Inherit text color (from parent, e.g., var(--color-text)) */
+  transition: all 0.2s ease;     /* Smooth hover effect */
+}
+
+a:hover {
+  text-decoration: underline;    /* Underline on hover */
+}
+
