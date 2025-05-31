@@ -8,7 +8,7 @@ import image2 from '../resources/hardwareIMG.png';
 import image3 from '../resources/green.png';
 
 const LoginPage = () => {
-  return (
+  return (<>
     <div className="rowContainer">
       <div className="upperSection">
         <div className="loginContainer">
@@ -24,6 +24,7 @@ const LoginPage = () => {
         <img src={image3} alt="Example" />
       </div>
     </div>
+  </>
   );
 };
 
