@@ -9,38 +9,36 @@ function ActiveUsers() {
 
   return (
     <Paper
-      style={{
-        maxHeight: "30vh", // 30% of viewport height
-        width: "80vw", // 80% of viewport width
-        overflow: "auto",
-        padding: "2vw", // Responsive padding
-        margin: "auto", // Center horizontally
+      elevation={3}
+      sx={{
+        maxHeight: "30vh",
+        width: "100%",
+        // flex: 1,
+        borderRadius: "20px",
+        minWidth: "300px",
+        overflowY: "auto",
+        p: 2,
       }}
     >
-      <List>
-        {/* labels */}
-        <ListItem key={"label"} disableGutters>
+      <List disablePadding>
+        {/* Header */}
+        <ListItem disableGutters>
           <Box
             display="flex"
             justifyContent="space-between"
             width="100%"
-            px="1vw"
+
           >
             <Typography fontWeight="bold">User ID</Typography>
             <Typography color="text.secondary">Uptime</Typography>
           </Box>
         </ListItem>
 
-        {/* values */}
+        {/* Users */}
         {users.map((user, index) => (
           <ListItem key={index} disableGutters>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              width="100%"
-              px="1vw"
-            >
-              <Typography fontWeight="bold">ID: {user.id}</Typography>
+            <Box display="flex" justifyContent="space-between" width="100%">
+              <Typography>ID: {user.id}</Typography>
               <Typography color="text.secondary">{user.time}</Typography>
             </Box>
           </ListItem>
