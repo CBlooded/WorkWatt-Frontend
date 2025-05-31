@@ -1,152 +1,128 @@
 import { TextField, Button, Box, InputLabel } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
-import { useEffect, useState, useRef } from "react";
+import { useRef } from "react";
 
-import { useParams } from "react-router";
+import { useSearchParams } from "react-router";
+import RegisterNewPassword from "./RegisterUserConfirmationPassword";
 
 type tempRegTypes = {
   tempPassword: string;
-  newPassword: string;
-  newPasswordRepeat: string;
 };
 
-const LoginForm = () => {
+const RegisterUserConfirmation = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<tempRegTypes>();
 
-  // check if hostId is correct
-  const [hostUUID, setHostUUID] = useState<string>("");
-  const params = useParams();
   const feedback = useRef<HTMLParagraphElement>(null);
-  let userConfirmed = false;
+  const userConfirmed = useRef<boolean>(true);
+  // let userConfirmed = false;
 
-  useEffect(() => {
-    setHostUUID(params.hostUUID || "");
+  const [searchParams] = useSearchParams();
+  const h = searchParams.get("h");
+
+  /*useEffect(() => {
     try {
+      console.log("current host id: ", h);
       const response = AxiosConfig.get(
         //TODO: change endpoint var
-        `/api/v1/account/confirm?hostId=${params.hostUUID}`
+        `/api/v1/user/password/host/validate?h=${h}&t=${t}`
       );
-      // console.log(response);
       response
         .then(() => {
-          console.log(hostUUID);
-          feedback.current!.textContent = "";
-          userConfirmed = true;
+          // user confirmation
+          feedback.current!.textContent = "user confirmed";
+          userConfirmed.current = true;
         })
         .catch((err) => {
+          // error & user not confirmed
           feedback.current!.textContent = "Error occured, no hostId";
-          console.log(err);
-          userConfirmed = false;
+          console.log("error: ", err);
+          userConfirmed.current = false;
         });
     } catch (error) {
       console.log(`error:${error}`);
     }
-  }, [params.hostUUID]);
+  }, [h]);*/
 
   const onSubmit = async (data: tempRegTypes) => {
     try {
-      const response = await AxiosConfig.post(
-        "/api/v1/auth/authenticate",
-        data
+      // TODO: check temp password
+      const response = await AxiosConfig.get(
+         `/api/v1/user/password/host/validate?h=${h}&t=${data.tempPassword}`
       );
 
       console.log("succesful confirmation", response.data);
+      userConfirmed.current = true;
     } catch (error) {
+
       console.error("An error occurred during user confirmation:", error);
+      userConfirmed.current = false;
     }
   };
+
   return (
     <>
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          borderRadius: 2,
-          width: 300,
-          boxShadow: 10,
-          padding: 3,
-        }}
-      >
-        <InputLabel
+      {!userConfirmed.current && (
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
           sx={{
-            fontSize: "1.5rem",
-            fontWeight: 500,
-            mb: 1,
-            color: "var(--color-accent)",
-            fontFamily: "Roboto, sans-serif",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            borderRadius: 2,
+            width: 300,
+            boxShadow: 10,
+            padding: 3,
           }}
         >
-          Confrim account
-        </InputLabel>
-
-        <div ref={feedback}> </div>
-
-        <TextField
-          label="Enter temporary password"
-          variant="outlined"
-          // disabled={true}
-          {...register("tempPassword", { required: "Email is required" })}
-          sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
-          error={!!errors.tempPassword}
-          helperText={errors.tempPassword?.message}
-        />
-
-        {userConfirmed && (
-          <TextField
-            label="New password"
-            type="password"
-            variant="outlined"
-            {...register("newPassword", { required: "Password is required" })}
+          <InputLabel
             sx={{
-              backgroundColor: "white",
-              boxShadow: 1,
-              borderRadius: 2,
+              fontSize: "1.5rem",
+              fontWeight: 500,
+              mb: 1,
+              color: "var(--color-accent)",
+              fontFamily: "Roboto, sans-serif",
             }}
-            error={!!errors.newPassword}
-            helperText={errors.newPassword?.message}
-          />
-        )}
+          >
+            Confrim account
+          </InputLabel>
 
-        {userConfirmed && (
+          <div ref={feedback}></div>
           <TextField
-            label="Repeat new password"
-            type="password"
+            label="Enter temporary password"
             variant="outlined"
-            {...register("newPasswordRepeat", {
-              required: "Password is required",
+            // disabled={true}
+            {...register("tempPassword", {
+              required: "Temporary password is required",
             })}
-            sx={{
-              backgroundColor: "white",
-              boxShadow: 1,
-              borderRadius: 2,
-            }}
-            error={!!errors.newPasswordRepeat}
-            helperText={errors.newPasswordRepeat?.message}
+            sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
+            error={!!errors.tempPassword}
+            helperText={errors.tempPassword?.message}
           />
-        )}
 
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{
-            backgroundColor: "var(--color-secondary)",
-            color: "var(--color-text-dark)",
-          }}
-        >
-          Confirm
-        </Button>
-      </Box>
+          {/* when host and temp password is confirmed -> change to new password */}
+
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              backgroundColor: "var(--color-secondary)",
+              color: "var(--color-text-dark)",
+            }}
+          >
+            Confirm
+          </Button>
+        </Box>
+      )}
+      {userConfirmed.current && <RegisterNewPassword />}
     </>
   );
 };
 
-export default LoginForm;
+export default RegisterUserConfirmation;

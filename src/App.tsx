@@ -12,13 +12,14 @@ import RegisterForm from "./components/RegisterForm";
 import LoginPage from "./pages/LoginPage";
 
 import RegisterUser from "./components/RegisterUserConfirmation";
-import SingleUserChart from './components/SingleUserChart'
-
+import SingleUserChart from "./components/SingleUserChart";
+import RegisterUserConfirmation from "./components/RegisterUserConfirmation";
+// import SingleUserChart from './components/SingleUserChart'
 
 function App() {
   const role = 0;
-  const token = "abc"
-  sessionStorage.setItem('token',token)
+  const token = "abc";
+  sessionStorage.setItem("token", token);
   sessionStorage.setItem("role", String(role));
   return (
     <>
@@ -26,8 +27,11 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LoginPage />} />
-
-            <Route path="/account/confirm" element={<RegisterUser />} />
+            <Route
+              path="/account/confirm"
+              element={<RegisterUserConfirmation />}
+            />
+            <Route path="/account/register" element={<RegisterForm />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/tempRegister" />
               <Route path="/register" element={<RegisterForm />} />
