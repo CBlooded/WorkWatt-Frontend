@@ -3,8 +3,9 @@ import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
 
 type tempRegTypes = {
-  email: string;
-  password: string;
+  tempPassword: string;
+  newPassword: string;
+  newPasswordRepeat: string;
 };
 
 const LoginForm = () => {
@@ -53,22 +54,32 @@ const LoginForm = () => {
         Confrim account
       </InputLabel>
       <TextField
-        label="Email"
+        label="Enter temporary password"
         variant="outlined"
-        {...register("email", { required: "Email is required" })}
+        // disabled={true}
+        {...register("tempPassword", { required: "Email is required" })}
         sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
-        error={!!errors.email}
-        helperText={errors.email?.message}
+        error={!!errors.tempPassword}
+        helperText={errors.tempPassword?.message}
       />
 
       <TextField
-        label="Password"
+        label="New password"
         type="password"
         variant="outlined"
-        {...register("password", { required: "Password is required" })}
+        {...register("newPassword", { required: "Password is required" })}
         sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
-        error={!!errors.password}
-        helperText={errors.password?.message}
+        error={!!errors.newPassword}
+        helperText={errors.newPassword?.message}
+      />
+      <TextField
+        label="Repeat new password"
+        type="password"
+        variant="outlined"
+        {...register("newPasswordRepeat", { required: "Password is required" })}
+        sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
+        error={!!errors.newPasswordRepeat}
+        helperText={errors.newPasswordRepeat?.message}
       />
 
       <Button
