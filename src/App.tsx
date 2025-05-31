@@ -6,13 +6,16 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import Navbar from "./components/navbar";
+import { BrowserRouter } from "react-router";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
-    <>
-      <Navbar />
-    </>
+    <BrowserRouter>
+      <div className="app">
+        <Navbar />
+      </div>
+    </BrowserRouter>
   );
 }
 
