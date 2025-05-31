@@ -1,6 +1,7 @@
 import { TextField, Box, InputLabel, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
+import { useNavigate } from "react-router-dom";
 
 type RegisterTypes = {
   email: string;
@@ -11,7 +12,7 @@ type RegisterTypes = {
 
 const RegisterForm = () => {
   const role = sessionStorage.getItem("role");
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -21,6 +22,8 @@ const RegisterForm = () => {
   const onSubmit = async (data: RegisterTypes) => {
     try {
       await AxiosConfig.post("/api/v1/auth/register", data);
+
+      navigate("/");
     } catch (error) {
       console.error("An error occurred during registration:", error);
     }

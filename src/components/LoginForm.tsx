@@ -18,6 +18,7 @@ const LoginForm = () => {
 
   const onSubmit = async (data: LoginTypes) => {
     try {
+      console.log(data);
       const response = await AxiosConfig.post(
         "/api/v1/auth/authenticate",
         data

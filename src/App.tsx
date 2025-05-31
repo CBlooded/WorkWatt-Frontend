@@ -28,7 +28,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route
-              path="/account/confirm"
+              path="/account/confirm?/*"
               element={<RegisterUserConfirmation />}
             />
             <Route path="/account/register" element={<RegisterForm />} />

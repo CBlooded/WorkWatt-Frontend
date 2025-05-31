@@ -3,35 +3,42 @@ import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
 import { useRef } from "react";
 import { useSearchParams } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 // import { useParams, useSearchParams } from "react-router";
 
 type tempRegTypes = {
+  hostId: string;
   newPassword: string;
-  newPasswordRepeat: string;
 };
 
 const RegisterUserConfirmationPassword = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<tempRegTypes>();
 
+  const hostId = sessionStorage.getItem("hostid");
+
   const [searchParams] = useSearchParams();
-  const h = searchParams.get("h");
 
   const feedback = useRef<HTMLParagraphElement>(null);
 
   const onSubmit = async (data: tempRegTypes) => {
     try {
-      // todo: set new password
-      // POST /api/v1/user/password/set?h=...&n=...
+      const submitData = {
+        hostId,
+        ...data,
+      };
       const response = await AxiosConfig.post(
-        `/api/v1/user/password/set?h=${h}&n=${data.newPassword}`
+        `/api/v1/user/password/set`,
+        submitData
       );
 
       console.log("succesful confirmation", response.data);
+      navigate("/");
     } catch (error) {
       console.error("An error occurred during user confirmation:", error);
     }
@@ -80,23 +87,6 @@ const RegisterUserConfirmationPassword = () => {
           error={!!errors.newPassword}
           helperText={errors.newPassword?.message}
         />
-
-        <TextField
-          label="Repeat new password"
-          type="password"
-          variant="outlined"
-          {...register("newPasswordRepeat", {
-            required: "Repeat password is required",
-          })}
-          sx={{
-            backgroundColor: "white",
-            boxShadow: 1,
-            borderRadius: 2,
-          }}
-          error={!!errors.newPasswordRepeat}
-          helperText={errors.newPasswordRepeat?.message}
-        />
-
         <Button
           type="submit"
           variant="contained"

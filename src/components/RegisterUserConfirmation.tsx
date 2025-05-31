@@ -18,11 +18,12 @@ const RegisterUserConfirmation = () => {
   } = useForm<tempRegTypes>();
 
   const feedback = useRef<HTMLParagraphElement>(null);
-  const userConfirmed = useRef<boolean>(true);
+  const userConfirmed = useRef<boolean>(false);
   // let userConfirmed = false;
 
   const [searchParams] = useSearchParams();
   const h = searchParams.get("h");
+  const hostid = sessionStorage.setItem("hostid", h);
 
   /*useEffect(() => {
     try {
@@ -51,14 +52,16 @@ const RegisterUserConfirmation = () => {
   const onSubmit = async (data: tempRegTypes) => {
     try {
       // TODO: check temp password
+      console.log(
+        `/api/v1/user/password/host/validate?h=${h}&t=${data.tempPassword}`
+      );
       const response = await AxiosConfig.get(
-         `/api/v1/user/password/host/validate?h=${h}&t=${data.tempPassword}`
+        `/api/v1/user/password/host/validate?h=${h}&t=${data.tempPassword}`
       );
 
       console.log("succesful confirmation", response.data);
       userConfirmed.current = true;
     } catch (error) {
-
       console.error("An error occurred during user confirmation:", error);
       userConfirmed.current = false;
     }
