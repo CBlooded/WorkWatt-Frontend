@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as RouterLink } from "react-router";
+import { useNavigate } from "react-router-dom"; // Changed from react-router
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -15,20 +15,28 @@ import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import Divider from "@mui/material/Divider";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
-const pages = [
-  { name: "Home", path: "/", icon: <HomeIcon /> },
-  { name: "About", path: "/About", icon: <InfoIcon /> },
-  { name: "Contact", path: "/Contact", icon: <ContactPageIcon /> },
-];
+const role = Number(sessionStorage.getItem("role"));
 
-//tba
+const pages = [
+  { name: "Home", path: "/", icon: <HomeIcon />, roles: [0, 1, 2] },
+  { name: "Register new user", path: "/register", icon: <PersonAddIcon />, roles: [0,1] },
+  {
+    name: "Dashboard",
+    path: "/Dashboard",
+    icon: <ContactPageIcon />,
+    roles: [0,1, 2],
+  },
+  { name: "About", path: "/About", icon: <InfoIcon />, roles: [0, 1, 2] },
+];
 
 const drawerWidth = 240;
 
-function Navbar() {
+function Navbar({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate(); 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -37,9 +45,16 @@ function Navbar() {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      setMobileOpen(false); 
+    }
+  };
+
   const drawer = (
-    <Box sx={{ height: "100%", backgroundColor: "green" }}>
-      <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 2 }}>
+    <Box sx={{ height: "100%", backgroundColor: "var(--color-secondary)" }}>
+      <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
         <ElectricalServicesIcon sx={{ color: "#000000" }} />
         <Typography
           variant="h6"
@@ -55,30 +70,35 @@ function Navbar() {
       </Box>
       <Divider />
       <List>
-        {pages.map((page) => (
-          <ListItem key={page.name} disablePadding>
-            <ListItemButton
-              component={RouterLink}
-              to={page.path}
-              sx={{
-                "&:hover": {
-                  backgroundColor: "rgba(0, 0, 0, 0.1)",
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: "#000000" }}>{page.icon}</ListItemIcon>
-              <ListItemText
-                primary={page.name}
-                primaryTypographyProps={{
-                  sx: {
-                    color: "#000000",
-                    fontWeight: "bold",
+        {pages
+          .filter((page) => page.roles.includes(role))
+          .map((page) => (
+            <ListItem key={page.name} disablePadding sx={{ p: 2 }}>
+              <ListItemButton
+                onClick={() => handleNavigation(page.path)} 
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
                   },
                 }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+              >
+                {page.icon && (
+                  <ListItemIcon sx={{ color: "#000000" }}>
+                    {page.icon}
+                  </ListItemIcon>
+                )}
+                <ListItemText
+                  primary={page.name}
+                  primaryTypographyProps={{
+                    sx: {
+                      color: "#000000",
+                      fontWeight: "bold",
+                    },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
       </List>
     </Box>
   );
@@ -145,7 +165,7 @@ function Navbar() {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        {/* Your page content will go here */}
+        {children}
       </Box>
     </Box>
   );

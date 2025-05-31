@@ -6,7 +6,7 @@ type RegisterTypes = {
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role: number;
 };
 
 const RegisterForm = () => {
@@ -78,9 +78,12 @@ const RegisterForm = () => {
       />
       <TextField
         label="Role"
-        type="text"
+        type="number"
         variant="outlined"
-        {...register("role", { required: "Role is required" })}
+        {...register("role", {
+          required: "Role is required",
+          validate: (value) => [2, 3].includes(Number(value)),
+        })}
         sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
         error={!!errors.role}
         helperText={errors.role?.message}
