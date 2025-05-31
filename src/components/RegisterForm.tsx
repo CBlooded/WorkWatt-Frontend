@@ -10,6 +10,8 @@ type RegisterTypes = {
 };
 
 const RegisterForm = () => {
+  const role = sessionStorage.getItem("role");
+
   const {
     register,
     handleSubmit,
@@ -76,18 +78,33 @@ const RegisterForm = () => {
         error={!!errors.lastName}
         helperText={errors.lastName?.message}
       />
-      <TextField
-        label="Role"
-        type="number"
-        variant="outlined"
-        {...register("role", {
-          required: "Role is required",
-          validate: (value) => [2, 3].includes(Number(value)),
-        })}
-        sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
-        error={!!errors.role}
-        helperText={errors.role?.message}
-      />
+      {role === 0 ? (
+        <TextField
+          label="Role"
+          type="number"
+          variant="outlined"
+          {...register("role", {
+            required: "Role is required",
+            validate: (value) => [0, 1, 2].includes(Number(value)),
+          })}
+          sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
+          error={!!errors.role}
+          helperText={errors.role?.message}
+        />
+      ) : (
+        <TextField
+          label="Role"
+          type="number"
+          variant="outlined"
+          {...register("role", {
+            required: "Role is required",
+            validate: (value) => [2].includes(Number(value)),
+          })}
+          sx={{ backgroundColor: "white", boxShadow: 1, borderRadius: 2 }}
+          error={!!errors.role}
+          helperText={errors.role?.message}
+        />
+      )}
 
       <Button
         type="submit"
