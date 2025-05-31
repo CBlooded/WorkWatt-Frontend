@@ -17,7 +17,7 @@ const LoginForm = () => {
   const onSubmit = async (data: LoginTypes) => {
     try {
       const response = await AxiosConfig.post(
-        "/api/v1/auth/login/authenticate",
+        "/api/v1/auth/authenticate",
         data
       );
       const token = response.data.token;
@@ -43,7 +43,17 @@ const LoginForm = () => {
         padding: 3,
       }}
     >
-      <InputLabel>Log in</InputLabel>
+      <InputLabel
+        sx={{
+          fontSize: "1.5rem",
+          fontWeight: 500,
+          mb: 1,
+          color: "var(--color-accent)",
+          fontFamily: "Roboto, sans-serif",
+        }}
+      >
+        Log in
+      </InputLabel>
       <TextField
         label="Email"
         variant="outlined"
