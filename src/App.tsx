@@ -10,8 +10,10 @@ import { Route, Routes, BrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterForm from "./components/RegisterForm";
 import LoginPage from "./pages/LoginPage";
+
 import RegisterUser from "./components/RegisterUserConfirmation";
 import SingleUserChart from './components/SingleUserChart'
+
 
 function App() {
   const role = 0;
@@ -24,6 +26,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LoginPage />} />
+
             <Route path="/account/confirm" element={<RegisterUser />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/tempRegister" />
