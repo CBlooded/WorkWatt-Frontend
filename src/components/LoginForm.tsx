@@ -34,6 +34,7 @@ const LoginForm = () => {
       onSubmit={handleSubmit(onSubmit)}
       noValidate
       sx={{
+        backgroundColor: "white",
         display: "flex",
         flexDirection: "column",
         gap: 2,
