@@ -1,6 +1,7 @@
 import { TextField, Button, Box, InputLabel } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
+//import { useNavigate } from "react-router";
 
 type LoginTypes = {
   email: string;
@@ -8,6 +9,7 @@ type LoginTypes = {
 };
 
 const LoginForm = () => {
+  //const Navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -45,7 +47,7 @@ const LoginForm = () => {
     >
       <InputLabel
         sx={{
-          fontSize: "1.5rem",
+          fontSize: "1rem",
           fontWeight: 500,
           mb: 1,
           color: "var(--color-accent)",
