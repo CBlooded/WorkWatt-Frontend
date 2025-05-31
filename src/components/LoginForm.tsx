@@ -1,6 +1,6 @@
 import { TextField, Button, Box, InputLabel } from "@mui/material";
-import React from "react";
 import { useForm } from "react-hook-form";
+import AxiosConfig from "../api/AxiosConfig";
 
 type LoginTypes = {
   email: string;
@@ -14,10 +14,20 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm<LoginTypes>();
 
-  const onSubmit = (data: LoginTypes) => {
-    console.log(data);
+  const onSubmit = async (data: LoginTypes) => {
+    try {
+      const response = await AxiosConfig.post(
+        "/api/v1/auth/login/authenticate",
+        data
+      );
+      const token = response.data.token;
+      if (token) {
+        sessionStorage.setItem("token", token);
+      }
+    } catch (error) {
+      console.error("An error occurred during login:", error);
+    }
   };
-
   return (
     <Box
       component="form"
@@ -33,7 +43,7 @@ const LoginForm = () => {
         padding: 3,
       }}
     >
-      <InputLabel sx={}>Log in</InputLabel>
+      <InputLabel>Log in</InputLabel>
       <TextField
         label="Email"
         variant="outlined"
@@ -58,7 +68,7 @@ const LoginForm = () => {
         variant="contained"
         sx={{
           backgroundColor: "var(--color-secondary)",
-          color: "var(--color-text)",
+          color: "var(--color-text-dark)",
         }}
       >
         Login
