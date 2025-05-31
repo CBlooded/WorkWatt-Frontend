@@ -1,7 +1,7 @@
 import { TextField, Button, Box, InputLabel } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
-//import { useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 type LoginTypes = {
   email: string;
@@ -9,7 +9,7 @@ type LoginTypes = {
 };
 
 const LoginForm = () => {
-  //const Navigate = useNavigate();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -27,6 +27,7 @@ const LoginForm = () => {
       if (token) {
         sessionStorage.setItem("token", token);
       }
+      navigate("/dashboard");
     } catch (error) {
       console.error("An error occurred during login:", error);
     }
