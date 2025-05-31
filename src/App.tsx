@@ -14,7 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <ProtectedRoute>
-            <Route path="/tempRegister" />
+            <Route path="/confirmRegister" />
             <Route path="/register" />
             <Route path="/dashboard" />
           </ProtectedRoute>
