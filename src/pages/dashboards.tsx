@@ -6,6 +6,15 @@ import SingleUserChart from "../components/SingleUserChart";
 import SavingChart from "../components/savingChart";
 import Estimator from "../components/estimator";
 
+/**
+ * A component that displays the dashboard page. It shows the active users
+ * as well as some system summary statistics. It also shows a chart of the
+ * current energy usage of a single user and a chart comparing the costs of
+ * energy with and without solar panels. Finally it shows an energy consumption
+ * estimator. The component is wrapped in the Navbar component to provide
+ * navigation.
+ * @returns {JSX.Element} The JSX element representing the dashboard page.
+ */
 const Dashboard = () => {
   return (
     <Navbar>
@@ -16,8 +25,7 @@ const Dashboard = () => {
         sx={{
           padding: 2,
           maxWidth: "70vw",
-          marginTop: "max(100vh, 550px)",
-          //   margin: "auto",
+          marginTop: "max(270vh, 1700px)",
         }}
       >
         <Typography variant="h4" fontWeight="bold">
@@ -25,7 +33,6 @@ const Dashboard = () => {
         </Typography>
         <div
           style={{
-            // backgroundColor: "red",
             display: "flex",
             justifyContent: "space-between",
             flexWrap: "wrap",
@@ -45,6 +52,7 @@ const Dashboard = () => {
               Total users online: 3
             </Typography>
           </Paper>
+          {/* System Summary period */}
           <Paper elevation={3} sx={{ p: 2, flex: 1, borderRadius: "20px" }}>
             <Typography variant="h6">Usage summary</Typography>
             <Typography color="text.secondary">
@@ -59,9 +67,8 @@ const Dashboard = () => {
           elevation={3}
           sx={{ p: 2, borderRadius: "20px", height: "50vh" }}
         >
-          {/* <Typography variant="h6">websocket data of single user usage</Typography> */}
+          {/* chart for power consumption tracking */}
           <div>
-            {/* TODO: ADD CHART with websocket from server */}
             <SingleUserChart />
           </div>
         </Paper>
@@ -69,9 +76,8 @@ const Dashboard = () => {
           elevation={3}
           sx={{ p: 2, borderRadius: "20px", height: "60vh" }}
         >
-          {/* <Typography variant="h6">Cost comparde with solar panels</Typography> */}
           <div>
-            {/* example data for chart */}
+            {/* chart for cost comparison - example data */}
             <SavingChart />
           </div>
         </Paper>
