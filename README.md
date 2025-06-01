@@ -1,54 +1,66 @@
-# React + TypeScript + Vite
+# WorkWatt Frontend  
+A React TypeScript web application for monitoring power usage and managing users.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Description  
+WorkWatt Frontend is a web interface for WorkWatt - a system designed to track computer power usage across an organization. It provides real-time monitoring, usage analytics, and user management.
 
-Currently, two official plugins are available:
+# Features  
+- User authentication and role-based access control  
+- Real-time active user monitoring via WebSockets  
+- Power usage visualization with charts  
+- User registration and management  
+- Responsive Material UI interface  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Prerequisites  
+- Node.js (v16+)  
+- npm or yarn  
 
-## Expanding the ESLint configuration
+# Installation  
+1. Clone the repository  
+2. Navigate to the project directory  
+3. Install dependencies
+4. `npm install`
+5. `npm run dev`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Project Structure  
+/src - Source code  
+/api - API configuration and interceptors  
+/components - Reusable UI components  
+/pages - Page components  
+/App.tsx - Main application component  
+/main.tsx - Entry point  
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+# Key Components  
+LoginForm - User authentication  
+RegisterForm - New user registration  
+SingleUserChart - Power usage visualization  
+ActiveUsers - Real-time user activity monitoring  
+Navbar - Navigation component  
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+# Technologies  
+React 19  
+TypeScript  
+Material UI 7  
+Vite  
+Axios  
+STOMP WebSockets  
+React Router  
+React Hook Form  
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+# Backend Integration  
+The application connects to a backend server at http://localhost:8080 with the following endpoints:  
+Authentication: /api/v1/auth/authenticate  
+User registration: /api/v1/user/password/set  
+Usage history: /api/v1/usage/history  
+Active users WebSocket: /api/v1/usage/active  
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+# Related Projects  
+wortwatt-desktop: Desktop client for tracking computer power usage  
+
+![image](https://github.com/user-attachments/assets/cd5ecd08-7853-4f89-aed0-a8fae3f15aa5)
+
+
+![image](https://github.com/user-attachments/assets/14bd429f-a7cb-4a06-808b-f8b7990349d6)
+
+![image](https://github.com/user-attachments/assets/10966291-2b17-4692-af12-339b085d5290)
+
