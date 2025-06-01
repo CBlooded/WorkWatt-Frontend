@@ -22,7 +22,7 @@ import { useTheme } from "@mui/material/styles";
 const role = Number(sessionStorage.getItem("role"));
 
 const pages = [
-  { name: "Home", path: "/", icon: <HomeIcon />, roles: [0, 1, 2] },
+  { name: "Login", path: "/", icon: <HomeIcon />, roles: [0, 1, 2] },
   {
     name: "Register new user",
     path: "/register",
@@ -35,7 +35,6 @@ const pages = [
     icon: <ContactPageIcon />,
     roles: [0, 1, 2],
   },
-  { name: "About", path: "/About", icon: <InfoIcon />, roles: [0, 1, 2] },
 ];
 
 const drawerWidth = 240;
