@@ -14,7 +14,6 @@ import LoginPage from "./pages/LoginPage";
 import RegisterUser from "./components/RegisterUserConfirmation";
 import SingleUserChart from "./components/SingleUserChart";
 import RegisterUserConfirmation from "./components/RegisterUserConfirmation";
-// import SingleUserChart from './components/SingleUserChart'
 
 function App() {
   const role = 0;
@@ -35,11 +34,12 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/tempRegister" />
               <Route path="/register" element={<RegisterForm />} />
-              <Route path="/dashboard" />
+              <Route path="/dashboard" element={<SingleUserChart />} />
             </Route>
           </Routes>
         </BrowserRouter>
       </div>
+      {/* <SingleUserChart /> */}
     </>
   );
 }
