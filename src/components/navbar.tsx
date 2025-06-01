@@ -15,7 +15,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import Divider from "@mui/material/Divider";
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
@@ -23,12 +23,17 @@ const role = Number(sessionStorage.getItem("role"));
 
 const pages = [
   { name: "Home", path: "/", icon: <HomeIcon />, roles: [0, 1, 2] },
-  { name: "Register new user", path: "/register", icon: <PersonAddIcon />, roles: [0,1] },
+  {
+    name: "Register new user",
+    path: "/register",
+    icon: <PersonAddIcon />,
+    roles: [0, 1],
+  },
   {
     name: "Dashboard",
     path: "/Dashboard",
     icon: <ContactPageIcon />,
-    roles: [0,1, 2],
+    roles: [0, 1, 2],
   },
   { name: "About", path: "/About", icon: <InfoIcon />, roles: [0, 1, 2] },
 ];
@@ -36,7 +41,7 @@ const pages = [
 const drawerWidth = 240;
 
 function Navbar({ children }: { children: React.ReactNode }) {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -48,7 +53,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const handleNavigation = (path: string) => {
     navigate(path);
     if (isMobile) {
-      setMobileOpen(false); 
+      setMobileOpen(false);
     }
   };
 
@@ -75,7 +80,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
           .map((page) => (
             <ListItem key={page.name} disablePadding sx={{ p: 2 }}>
               <ListItemButton
-                onClick={() => handleNavigation(page.path)} 
+                onClick={() => handleNavigation(page.path)}
                 sx={{
                   "&:hover": {
                     backgroundColor: "rgba(0, 0, 0, 0.1)",

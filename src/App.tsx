@@ -32,10 +32,10 @@ function App() {
               path="/account/confirm?/*"
               element={<RegisterUserConfirmation />}
             />
+            <Route path="/register" element={<RegisterForm />} />
             <Route path="/account/register" element={<RegisterForm />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/tempRegister" />
-              <Route path="/register" element={<RegisterForm />} />
               <Route path="/dashboard" element={<Dashboard />} />
             </Route>
           </Routes>

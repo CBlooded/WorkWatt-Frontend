@@ -3,6 +3,7 @@ import { Paper, Typography, Box } from "@mui/material";
 import Navbar from "../components/Navbar";
 import ActiveUsers from "../components/ActiveUsers";
 import SingleUserChart from "../components/SingleUserChart";
+import SupervisorChart from "../components/SupervisorChart";
 import SavingChart from "../components/savingChart";
 
 const Dashboard = () => {
@@ -60,8 +61,11 @@ const Dashboard = () => {
         >
           <Typography variant="h6"></Typography>
           <div>
-            {/* TODO: ADD CHART with websocket from server */}
-            <SingleUserChart />
+            {sessionStorage.getItem("role") === "2" ? (
+              <SingleUserChart />
+            ) : (
+              <SupervisorChart />
+            )}
           </div>
         </Paper>
         <Paper

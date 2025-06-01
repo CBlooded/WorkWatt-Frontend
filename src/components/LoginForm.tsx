@@ -25,12 +25,13 @@ const LoginForm = () => {
         data
       );
       const token = response.data.token;
+      console.log(token);
 
       if (token) {
         const decodedToken = JwtDecode(token);
         console.log(decodedToken);
         sessionStorage.setItem("token", token);
-
+        sessionStorage.setItem("userId", decodedToken.id);
         switch (decodedToken.Role) {
           case "EMPLOYEE":
             sessionStorage.setItem("role", "2");
