@@ -1,7 +1,7 @@
 import React from "react";
 import { Paper, Typography, Box } from "@mui/material";
 import Navbar from "../components/Navbar";
-// import ActiveUsers from "../components/activeUsers";
+import ActiveUsers from "../components/activeUsers";
 import SingleUserChart from "../components/SingleUserChart";
 import SupervisorChart from "../components/SupervisorChart";
 import SavingChart from "../components/savingChart";
@@ -42,7 +42,7 @@ const Dashboard = () => {
           }}
         >
           {/* Active Users */}
-          {/* <ActiveUsers /> */}
+          <ActiveUsers />
 
           {/* System Summary */}
           <Paper elevation={3} sx={{ p: 2, flex: 3, borderRadius: "20px" }}>

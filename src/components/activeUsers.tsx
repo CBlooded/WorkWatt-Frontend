@@ -1,114 +1,175 @@
-// import React, { useEffect, useState, useRef } from "react";
-// import { Paper, List, ListItem, Box, Typography } from "@mui/material";
-// import SockJS from "sockjs-client";
-// import { Client } from "@stomp/stompjs";
+import React, { useEffect, useState } from "react";
+import {
+  Paper,
+  List,
+  ListItem,
+  Box,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
-// type User = {
-//   userId: string;
-//   userFullName: string;
-//   computerName: string;
-//   start: Date;
-// };
+type User = {
+  userId: string;
+  userFullName: string;
+  computerName: string;
+  start: Date;
+  delete: boolean;
+};
 
-// function ActiveUsers({ supervisorId = "supervisor1" }) {
-//   const [users, setUsers] = useState<User[]>([]);
-//   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+function ActiveUsers() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [connecting, setConnecting] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-//   useEffect(() => {
-//     const stompClient = new Client({
-//       webSocketFactory: () =>
-//         new SockJS("http://localhost:8080/api/v1/usage/active"),
-//       reconnectDelay: 5000,
-//       onConnect: () => {
-//         stompClient.subscribe(`/topic/updates/${supervisorId}`, (message) => {
-//           const data = JSON.parse(message.body);
+  useEffect(() => {
+    // Setup STOMP client inside the effect
+    const stompClient = new Client({
+      webSocketFactory: () =>
+        new SockJS("http://localhost:8080/api/v1/usage/active"),
+      reconnectDelay: 5000,
+      debug: (str) => console.log(str),
+    });
 
-//           setUsers((prevUsers) => {
-//             const existing = prevUsers.find((u) => u.userId === data.userId);
-//             const newUser = {
-//               userId: data.userId,
-//               userFullName: data.userFullName,
-//               computerName: data.computerName,
-//               start: new Date(data.start),
-//             };
+    stompClient.onConnect = () => {
+      console.log("Connected to WebSocket");
+      setConnecting(false);
 
-//             if (existing) {
-//               return prevUsers.map((u) =>
-//                 u.userId === data.userId ? newUser : u
-//               );
-//             } else {
-//               return [...prevUsers, newUser];
-//             }
-//           });
-//         });
-//       },
-//     });
+      // Subscribe to user updates
+      stompClient.subscribe(
+        `/topic/updates/${sessionStorage.getItem("userId")}`,
+        (message) => {
+          try {
+            console.log("Received message:", message.body);
+            const parsedData = JSON.parse(message.body);
 
-//     stompClient.activate();
+            // Determine if the data is an array or a single object
+            let usersToAdd: User[] = [];
 
-//     return () => {
-//       stompClient.deactivate();
-//     };
-//   }, [supervisorId]);
+            if (Array.isArray(parsedData)) {
+              // It's an array of users
+              usersToAdd = parsedData;
+            } else if (parsedData && typeof parsedData === "object") {
+              // It's a single user object
+              usersToAdd = [parsedData];
+            } else {
+              console.error("Unexpected data format:", parsedData);
+              return;
+            }
 
-//   useEffect(() => {
-//     // Update uptime every second
-//     intervalRef.current = setInterval(() => {
-//       setUsers((prevUsers) => [...prevUsers]); // Triggers a re-render
-//     }, 1000);
+            // Convert string dates to Date objects
+            const usersWithDates = usersToAdd.map((user) => ({
+              ...user,
+              start: new Date(user.start),
+            }));
 
-//     return () => {
-//       if (intervalRef.current !== null) {
-//         clearInterval(intervalRef.current);
-//       }
-//     };
-//   }, []);
+            // Update users with new data (avoiding duplicates)
+            setUsers((prevUsers) => {
+              // Create a map of existing users by ID
+              const userMap = new Map(
+                prevUsers.map((user) => [user.userId, user])
+              );
 
-//   const formatDuration = (startTime: Date) => {
-//     const now = new Date();
-//     const diffMs = now.getTime() - startTime.getTime();
+              // Add or update users
+              usersWithDates.forEach((user) => {
+                userMap.set(user.userId, user);
+              });
 
-//     const totalSeconds = Math.floor(diffMs / 1000);
-//     const hours = Math.floor(totalSeconds / 3600);
-//     const minutes = Math.floor((totalSeconds % 3600) / 60);
-//     const seconds = totalSeconds % 60;
+              // Convert map back to array
+              return Array.from(userMap.values());
+            });
+          } catch (err) {
+            console.error("Error parsing message:", err);
+            setError("Failed to process server data");
+          }
+        }
+      );
+    };
 
-//     return `${hours}h ${minutes}m ${seconds}s`;
-//   };
+    stompClient.onStompError = (frame) => {
+      console.error("STOMP error:", frame);
+      setError("Connection error occurred");
+      setConnecting(false);
+    };
 
-//   return (
-//     <Paper
-//       elevation={3}
-//       sx={{
-//         maxHeight: "30vh",
-//         width: "100%",
-//         borderRadius: "20px",
-//         minWidth: "300px",
-//         overflowY: "auto",
-//         p: 2,
-//       }}
-//     >
-//       <List disablePadding>
-//         <ListItem disableGutters>
-//           <Box display="flex" justifyContent="space-between" width="100%">
-//             <Typography fontWeight="bold">User</Typography>
-//             <Typography color="text.secondary">Uptime</Typography>
-//           </Box>
-//         </ListItem>
+    // Activate connection
+    stompClient.activate();
 
-//         {users.map((user) => (
-//           <ListItem key={user.userId} disableGutters>
-//             <Box display="flex" justifyContent="space-between" width="100%">
-//               <Typography>{user.userFullName}</Typography>
-//               <Typography color="text.secondary">
-//                 {formatDuration(user.start)}
-//               </Typography>
-//             </Box>
-//           </ListItem>
-//         ))}
-//       </List>
-//     </Paper>
-//   );
-// }
+    // Clean up function
+    return () => {
+      if (stompClient.connected) {
+        stompClient.deactivate();
+      }
+    };
+  }, []);
 
-// export default ActiveUsers;
+  // Format date to readable string
+  const formatDate = (date: Date) => {
+    return date.toLocaleString();
+  };
+
+  return (
+    <Paper
+      elevation={3}
+      sx={{
+        maxHeight: "30vh",
+        width: "100%",
+        borderRadius: "20px",
+        minWidth: "300px",
+        overflowY: "auto",
+        p: 2,
+      }}
+    >
+      <List disablePadding>
+        <ListItem disableGutters>
+          <Box display="flex" justifyContent="space-between" width="100%">
+            <Typography fontWeight="bold">User</Typography>
+            <Typography color="text.secondary">Active Since</Typography>
+          </Box>
+        </ListItem>
+
+        {connecting ? (
+          <ListItem>
+            <Box display="flex" justifyContent="center" width="100%">
+              <CircularProgress size={24} />
+            </Box>
+          </ListItem>
+        ) : error ? (
+          <ListItem>
+            <Typography
+              color="error"
+              sx={{ width: "100%", textAlign: "center" }}
+            >
+              {error}
+            </Typography>
+          </ListItem>
+        ) : users.length > 0 ? (
+          users
+            .filter((user) => !user.delete) // Filter out users where enable is true
+            .map((user) => (
+              <ListItem key={user.userId} disableGutters>
+                <Box display="flex" justifyContent="space-between" width="100%">
+                  <Typography>{user.userFullName}</Typography>
+                  <Typography color="text.secondary">
+                    {formatDate(user.start)}
+                  </Typography>
+                </Box>
+              </ListItem>
+            ))
+        ) : (
+          <ListItem>
+            <Typography
+              color="text.secondary"
+              sx={{ width: "100%", textAlign: "center" }}
+            >
+              No active users
+            </Typography>
+          </ListItem>
+        )}
+      </List>
+    </Paper>
+  );
+}
+
+export default ActiveUsers;
