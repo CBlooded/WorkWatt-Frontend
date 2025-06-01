@@ -12,7 +12,8 @@ import RegisterForm from "./components/RegisterForm";
 import LoginPage from "./pages/LoginPage";
 
 import RegisterUser from "./components/RegisterUserConfirmation";
-import SingleUserChart from './components/SingleUserChart'
+// import SingleUserChart from './components/SingleUserChart'
+import Dashboard from "./pages/dashboards";
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LoginPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />  {/*TESTING*/}
 
             <Route path="/account/confirm" element={<RegisterUser />} />
             <Route element={<ProtectedRoute />}>
