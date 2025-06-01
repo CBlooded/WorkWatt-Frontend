@@ -64,6 +64,7 @@ export default function SingleUserChart() {
   const fetchChartData = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       let startDate: Date;
       let endDate: Date = new Date();
@@ -92,33 +93,93 @@ export default function SingleUserChart() {
         startDate = new Date();
         startDate.setDate(startDate.getDate() - 1);
       } else {
+        // default last 30 days
         startDate = new Date();
         startDate.setDate(startDate.getDate() - 30);
       }
 
       const params = {
-        startDate: startDate.toISOString().split("T")[0],
-        endDate: endDate.toISOString().split("T")[0],
+        s: String(startDate.getTime()),
+        e: String(endDate.getTime()),
+        u: "c760850a-634b-4cb6-9a88-52f629c567a2",
       };
 
-      const response = await AxiosConfig.get("/api/v1/chart/user/1", {
+      const response = await AxiosConfig.get("/api/v1/usage/history", {
         params,
       });
 
       const data = response.data;
-      setChartData({
-        xAxis: data.timestamps || data.xAxis || [1, 2, 3, 5, 8, 10],
-        series: data.values || data.series || [2, 5.5, 2, 8.5, 1.5, 5],
-      });
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching chart data:", err);
-      setError("Failed to load chart data. Please try again later.");
+      console.log(data);
+
+      // Build pairs of timestamp and value, filtering invalid entries
+      const pairs =
+        Array.isArray(data.X) && Array.isArray(data.Y)
+          ? (data.X.map((xStr: string, i: number) => {
+              // Convert 'dd:MM:yy' into timestamp
+              const [day, month, year] = xStr.split(":").map(Number);
+              const fullYear = 2000 + year; // Assumes '25' -> 2025
+              const date = new Date(fullYear, month - 1, day); // JS months are 0-based
+              const time = date.getTime();
+              const val = parseFloat(data.Y[i]);
+
+              if (!isNaN(time) && !isNaN(val)) {
+                return { time, val };
+              }
+              return null;
+            }).filter(Boolean) as { time: number; val: number }[])
+          : [];
+
+      if (pairs.length === 0) {
+        setError("No valid data to display for the selected period.");
+        setChartData(null);
+        return;
+      }
+
+      const safeTimestamps = pairs.map((p) => p.time);
+      const safeValues = pairs.map((p) => p.val);
 
       setChartData({
-        xAxis: [1, 2, 3, 5, 8, 10],
-        series: [2, 5.5, 2, 8.5, 1.5, 5],
+        xAxis: safeTimestamps,
+        series: safeValues,
       });
+    } catch (err: any) {
+      console.error("Error fetching chart data:", err);
+
+      if (err.response) {
+        switch (err.response.status) {
+          case 400:
+            setError("Invalid request parameters. Please check your filters.");
+            break;
+          case 401:
+            setError(
+              "You are not authorized to view this data. Please login again."
+            );
+            sessionStorage.removeItem("token");
+            break;
+          case 403:
+            setError("You don't have permission to access this data.");
+            break;
+          case 404:
+            setError("No usage data found for the selected period.");
+            break;
+          case 204:
+            setError("No content.");
+            break;
+          case 500:
+            setError(
+              "Server error. Please try again later or contact support."
+            );
+            break;
+          default:
+            setError(`Request failed with status code ${err.response.status}`);
+        }
+      } else if (err.request) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Failed to load chart data. Please try again later.");
+      }
+
+      setChartData(null);
     } finally {
       setLoading(false);
     }
@@ -160,18 +221,13 @@ export default function SingleUserChart() {
                   label="Month"
                   onChange={handleFilterChange}
                 >
-                  <MenuItem value={0}>January</MenuItem>
-                  <MenuItem value={1}>February</MenuItem>
-                  <MenuItem value={2}>March</MenuItem>
-                  <MenuItem value={3}>April</MenuItem>
-                  <MenuItem value={4}>May</MenuItem>
-                  <MenuItem value={5}>June</MenuItem>
-                  <MenuItem value={6}>July</MenuItem>
-                  <MenuItem value={7}>August</MenuItem>
-                  <MenuItem value={8}>September</MenuItem>
-                  <MenuItem value={9}>October</MenuItem>
-                  <MenuItem value={10}>November</MenuItem>
-                  <MenuItem value={11}>December</MenuItem>
+                  {[...Array(12)].map((_, i) => (
+                    <MenuItem key={i} value={i}>
+                      {new Date(0, i).toLocaleString("default", {
+                        month: "long",
+                      })}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -263,18 +319,33 @@ export default function SingleUserChart() {
         >
           <Typography color="error">{error}</Typography>
         </Box>
-      ) : (
+      ) : chartData &&
+        chartData.xAxis.length > 0 &&
+        chartData.series.length > 0 ? (
         <LineChart
-          xAxis={[{ data: chartData?.xAxis || [] }]}
-          series={[
+          xAxis={[
             {
-              data: chartData?.series || [],
-              label: "Power Usage (kWh)",
+              data: chartData.xAxis,
+              scaleType: "time",
+              formatter: (timestamp) =>
+                new Date(timestamp).toLocaleDateString(),
             },
           ]}
+          series={[{ data: chartData.series, label: "Power Usage (kWh)" }]}
           height={300}
           width={500}
         />
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: 300,
+          }}
+        >
+          <Typography>No data to display.</Typography>
+        </Box>
       )}
     </Box>
   );

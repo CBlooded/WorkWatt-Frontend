@@ -3,7 +3,7 @@ import { Paper, Typography, Box } from "@mui/material";
 import Navbar from "../components/Navbar";
 import ActiveUsers from "../components/ActiveUsers";
 import SingleUserChart from "../components/SingleUserChart";
-import SavingChart from '../components/savingChart';
+import SavingChart from "../components/savingChart";
 
 const Dashboard = () => {
   return (
@@ -58,7 +58,7 @@ const Dashboard = () => {
           elevation={3}
           sx={{ p: 2, borderRadius: "20px", height: "50vh" }}
         >
-          <Typography variant="h6">websocket data of single user usage</Typography>
+          <Typography variant="h6"></Typography>
           <div>
             {/* TODO: ADD CHART with websocket from server */}
             <SingleUserChart />
@@ -69,7 +69,8 @@ const Dashboard = () => {
           sx={{ p: 2, borderRadius: "20px", height: "50vh" }}
         >
           {/* <Typography variant="h6">Cost comparde with solar panels</Typography> */}
-          <div>{/* example data for chart */}
+          <div>
+            {/* example data for chart */}
             <SavingChart />
           </div>
         </Paper>
