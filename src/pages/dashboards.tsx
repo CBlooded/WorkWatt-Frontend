@@ -1,12 +1,21 @@
 import React from "react";
 import { Paper, Typography, Box } from "@mui/material";
 import Navbar from "../components/Navbar";
-import ActiveUsers from "../components/ActiveUsers";
+// import ActiveUsers from "../components/activeUsers";
 import SingleUserChart from "../components/SingleUserChart";
 import SupervisorChart from "../components/SupervisorChart";
 import SavingChart from "../components/savingChart";
+import AxiosConfig from "../api/AxiosConfig";
 
 const Dashboard = () => {
+  const today = async () => {
+    try {
+      const response = await AxiosConfig.get("/api/v1/usage/today/total");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Navbar>
       <Box
@@ -33,7 +42,7 @@ const Dashboard = () => {
           }}
         >
           {/* Active Users */}
-          <ActiveUsers />
+          {/* <ActiveUsers /> */}
 
           {/* System Summary */}
           <Paper elevation={3} sx={{ p: 2, flex: 3, borderRadius: "20px" }}>
@@ -48,7 +57,7 @@ const Dashboard = () => {
           <Paper elevation={3} sx={{ p: 2, flex: 1, borderRadius: "20px" }}>
             <Typography variant="h6">Usage summary</Typography>
             <Typography color="text.secondary">
-              Energy used today: 123.5 kWh
+              Energy used today: {today()}
             </Typography>
             <Typography color="text.secondary">
               Average month usage: 123.5 kWh

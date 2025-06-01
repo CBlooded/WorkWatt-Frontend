@@ -2,12 +2,17 @@ import { TextField, Button, Box, InputLabel } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
 import { useNavigate } from "react-router";
-import JwtDecode from "../services/JwtDecode";
+import { jwtDecode, type JwtPayload } from "jwt-decode";
 
 type LoginTypes = {
   email: string;
   password: string;
 };
+
+interface CustomJwtPayload extends JwtPayload {
+  id: string;
+  Role: string;
+}
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -28,7 +33,7 @@ const LoginForm = () => {
       console.log(token);
 
       if (token) {
-        const decodedToken = JwtDecode(token);
+        const decodedToken = jwtDecode<CustomJwtPayload>(token);
         console.log(decodedToken);
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("userId", decodedToken.id);
@@ -43,7 +48,7 @@ const LoginForm = () => {
             sessionStorage.setItem("role", "0");
             break;
           default:
-            console.warn("Unknown role:", decodedToken.role);
+            console.warn("Unknown role:", decodedToken.Role);
             break;
         }
       }

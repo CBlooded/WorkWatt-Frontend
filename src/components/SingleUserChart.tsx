@@ -3,13 +3,13 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import AxiosConfig from "../api/AxiosConfig";
 import {
   Box,
+  Grid,
   CircularProgress,
   Typography,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Grid,
   Button,
   TextField,
 } from "@mui/material";
@@ -192,7 +192,7 @@ export default function SingleUserChart() {
   return (
     <Box>
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <FormControl fullWidth>
             <InputLabel>Time Frame</InputLabel>
             <Select
@@ -212,7 +212,7 @@ export default function SingleUserChart() {
 
         {filters.timeFrame === "month" && (
           <>
-            <Grid item xs={6} md={3}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <FormControl fullWidth>
                 <InputLabel>Month</InputLabel>
                 <Select
@@ -231,7 +231,7 @@ export default function SingleUserChart() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6} md={3}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <TextField
                 fullWidth
                 label="Year"
@@ -245,7 +245,7 @@ export default function SingleUserChart() {
         )}
 
         {filters.timeFrame === "year" && (
-          <Grid item xs={12} md={3}>
+          <Grid size={{ xs: 12, md: 3 }}>
             <TextField
               fullWidth
               label="Year"
@@ -259,7 +259,7 @@ export default function SingleUserChart() {
 
         {filters.timeFrame === "custom" && (
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <Grid item xs={6} md={3}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <DatePicker
                 label="Start Date"
                 value={filters.startDate}
@@ -267,7 +267,8 @@ export default function SingleUserChart() {
                 slotProps={{ textField: { fullWidth: true } }}
               />
             </Grid>
-            <Grid item xs={6} md={3}>
+
+            <Grid size={{ xs: 6, md: 3 }}>
               <DatePicker
                 label="End Date"
                 value={filters.endDate}
@@ -279,9 +280,7 @@ export default function SingleUserChart() {
         )}
 
         <Grid
-          item
-          xs={12}
-          md={3}
+          size={{ xs: 6, md: 3 }}
           sx={{ display: "flex", alignItems: "center" }}
         >
           <Button
@@ -327,7 +326,7 @@ export default function SingleUserChart() {
             {
               data: chartData.xAxis,
               scaleType: "time",
-              formatter: (timestamp) =>
+              valueFormatter: (timestamp) =>
                 new Date(timestamp).toLocaleDateString(),
             },
           ]}

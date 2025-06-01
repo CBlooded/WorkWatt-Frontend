@@ -23,7 +23,7 @@ const RegisterUserConfirmation = () => {
 
   const [searchParams] = useSearchParams();
   const h = searchParams.get("h");
-  const hostid = sessionStorage.setItem("hostid", h);
+  const hostid = sessionStorage.setItem("hostid", h ?? "");
 
   /*useEffect(() => {
     try {

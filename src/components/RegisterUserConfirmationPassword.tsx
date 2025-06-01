@@ -29,6 +29,7 @@ const RegisterUserConfirmationPassword = () => {
   const onSubmit = async (data: tempRegTypes) => {
     try {
       const submitData = {
+        //@ts-ignore
         hostId,
         ...data,
       };
@@ -69,7 +70,7 @@ const RegisterUserConfirmationPassword = () => {
             fontFamily: "Roboto, sans-serif",
           }}
         >
-          Confrim account
+          Confirm account
         </InputLabel>
 
         <div ref={feedback}> </div>

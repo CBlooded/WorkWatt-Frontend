@@ -81,7 +81,7 @@ const RegisterForm = () => {
         error={!!errors.lastName}
         helperText={errors.lastName?.message}
       />
-      {role === 0 ? (
+      {Number(role) === 0 ? (
         <TextField
           label="Role"
           type="number"
