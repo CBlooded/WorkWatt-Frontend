@@ -3,7 +3,8 @@ import { Paper, Typography, Box } from "@mui/material";
 import Navbar from "../components/Navbar";
 import ActiveUsers from "../components/ActiveUsers";
 import SingleUserChart from "../components/SingleUserChart";
-import SavingChart from '../components/savingChart';
+import SavingChart from "../components/savingChart";
+import Estimator from "../components/estimator";
 
 const Dashboard = () => {
   return (
@@ -69,10 +70,12 @@ const Dashboard = () => {
           sx={{ p: 2, borderRadius: "20px", height: "60vh" }}
         >
           {/* <Typography variant="h6">Cost comparde with solar panels</Typography> */}
-          <div>{/* example data for chart */}
+          <div>
+            {/* example data for chart */}
             <SavingChart />
           </div>
         </Paper>
+        <Estimator />
       </Box>
     </Navbar>
   );
