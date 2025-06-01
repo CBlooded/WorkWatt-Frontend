@@ -8,7 +8,16 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-// import { set } from "react-hook-form";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 const Estimator = () => {
   const [hoursPerDay, setHoursPerDay] = useState(8);
@@ -24,11 +33,42 @@ const Estimator = () => {
   const calculateMonthlyCost = () => {
     const kW_total = (powerComsumption * workstationCount) / 1000;
     const totalKwh =
-      (powerComsumption * workstationCount * hoursPerDay * daysPerMonth) / 1000;
+      (powerComsumption *
+        workstationCount *
+        hoursPerDay *
+        daysPerMonth) /
+      1000;
     const cost = totalKwh * pricePerKwh;
     setTotalKw(kW_total);
     setTotalKwh(totalKwh);
     setResultMonthPrice(Number(cost.toFixed(2)));
+  };
+
+  const getOneYearWithSolarReduction = () => {
+    if (!resultMonthPrice) return [];
+
+    const avgSolarProductionPerHour = 0.142; // kWh per kW per hour (Krakow 2019)
+    const energySellPrice = 0.51062; // PLN/kWh
+    const autoconsumptionRate = 0.22; // 22%
+
+    const yearlyUsageKwh = resultMonthPrice * 12 / pricePerKwh;
+
+    const solarKwhPerYear =
+      avgSolarProductionPerHour * hoursPerDay * 365 * totalKw;
+
+    const autoconsumedKwh = solarKwhPerYear * autoconsumptionRate;
+    const soldKwh = solarKwhPerYear * (1 - autoconsumptionRate);
+
+    const savingsFromAuto = autoconsumedKwh * pricePerKwh;
+    const incomeFromSold = soldKwh * energySellPrice;
+
+    const reducedYearlyCost =
+      resultMonthPrice * 12 - (savingsFromAuto + incomeFromSold);
+
+    return [
+      { name: "Bez PV", cost: resultMonthPrice * 12 },
+      { name: "Z PV", cost: Math.max(0, reducedYearlyCost) },
+    ];
   };
 
   return (
@@ -83,6 +123,7 @@ const Estimator = () => {
           >
             Estimate
           </Button>
+
           {resultMonthPrice !== null && (
             <>
               <Alert severity="info">
@@ -96,11 +137,32 @@ const Estimator = () => {
                 Net kW usage: <strong>{totalKw}</strong>
               </Alert>
               <Alert severity="info">
-                Solar panels estimated cost: <strong>{totalKw * 5000}</strong>
+                Solar panels estimated cost:{" "}
+                <strong>{totalKw * 5000} zł</strong>
               </Alert>
-              <Typography variant="h6" textAlign="center" gutterBottom>
-                Koszt instalacji PV za 1 kW [PLN/kW] <br />5 000
-              </Typography>
+
+              <Box mt={4}>
+                <Typography variant="h6" textAlign="center" gutterBottom>
+                  Roczny koszt energii – Bez PV vs Z PV (uwzględniając
+                  produkcję i sprzedaż)
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={getOneYearWithSolarReduction()}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis
+                      label={{
+                        value: "Cost (zł)",
+                        angle: -90,
+                        position: "insideLeft",
+                      }}
+                    />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="cost" fill="#1976d2" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
             </>
           )}
         </Box>
