@@ -58,7 +58,7 @@ const Dashboard = () => {
           elevation={3}
           sx={{ p: 2, borderRadius: "20px", height: "50vh" }}
         >
-          <Typography variant="h6">websocket data of single user usage</Typography>
+          {/* <Typography variant="h6">websocket data of single user usage</Typography> */}
           <div>
             {/* TODO: ADD CHART with websocket from server */}
             <SingleUserChart />
@@ -66,7 +66,7 @@ const Dashboard = () => {
         </Paper>
         <Paper
           elevation={3}
-          sx={{ p: 2, borderRadius: "20px", height: "50vh" }}
+          sx={{ p: 2, borderRadius: "20px", height: "60vh" }}
         >
           {/* <Typography variant="h6">Cost comparde with solar panels</Typography> */}
           <div>{/* example data for chart */}

@@ -79,8 +79,10 @@ export default function SingleUserChart() {
           label: "Power Usage (kWh)",
         },
       ]}
-      height={300}
-      width={500}
+      // height={300}
+      // width={100}
+      sx={{ height: '50vh',
+        width: '65vw' }}
     />
   );
 }
