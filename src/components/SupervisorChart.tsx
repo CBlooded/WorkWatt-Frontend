@@ -27,12 +27,21 @@ type FilterOptions = {
   endDate: Date | null;
   month: number | null;
   year: number | null;
+  selectedUserId: string | null;
 };
 
-export default function SingleUserChart() {
+type UserNameMap = {
+  [userId: string]: string;
+};
+
+export default function SupervisorChart() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [userNames, setUserNames] = useState<UserNameMap>({});
+  const [userData, setUserData] = useState<{ [userId: string]: string[] }>({});
+  const [timestamps, setTimestamps] = useState<string[]>([]);
+  const [rawData, setRawData] = useState<any>(null);
 
   const [filters, setFilters] = useState<FilterOptions>({
     timeFrame: "month",
@@ -40,6 +49,7 @@ export default function SingleUserChart() {
     endDate: null,
     month: new Date().getMonth(),
     year: new Date().getFullYear(),
+    selectedUserId: null,
   });
 
   const handleFilterChange = (event: any) => {
@@ -48,6 +58,11 @@ export default function SingleUserChart() {
       ...prev,
       [name]: value,
     }));
+
+    // If user selection changed, update chart data
+    if (name === "selectedUserId" && value) {
+      updateChartForUser(value);
+    }
   };
 
   const handleDateChange = (name: string, date: Date | null) => {
@@ -55,6 +70,49 @@ export default function SingleUserChart() {
       ...prev,
       [name]: date,
     }));
+  };
+
+  const updateChartForUser = (userId: string) => {
+    if (!timestamps.length || !userData[userId]) {
+      setError("No data available for selected user");
+      setChartData(null);
+      return;
+    }
+
+    // Convert timestamps to Date objects
+    const xAxisData = timestamps.map((xStr) => {
+      const [day, month, year] = xStr.split(":").map(Number);
+      const fullYear = 2000 + year; // Assumes '25' -> 2025
+      return new Date(fullYear, month - 1, day).getTime();
+    });
+
+    // Convert user values (handling comma decimal separator)
+    const userValues = userData[userId].map((val) => {
+      return parseFloat(val.replace(",", "."));
+    });
+
+    // Create valid data pairs
+    const pairs = xAxisData
+      .map((time, i) => {
+        const val = userValues[i];
+        if (!isNaN(time) && !isNaN(val)) {
+          return { time, val };
+        }
+        return null;
+      })
+      .filter(Boolean) as { time: number; val: number }[];
+
+    if (pairs.length === 0) {
+      setError("No valid data points for the selected user.");
+      setChartData(null);
+      return;
+    }
+
+    setChartData({
+      xAxis: pairs.map((p) => p.time),
+      series: pairs.map((p) => p.val),
+    });
+    setError(null);
   };
 
   const applyFilters = () => {
@@ -65,6 +123,8 @@ export default function SingleUserChart() {
     try {
       setLoading(true);
       setError(null);
+      // Reset user names to avoid accumulation
+      setUserNames({});
 
       let startDate: Date;
       let endDate: Date = new Date();
@@ -101,47 +161,80 @@ export default function SingleUserChart() {
       const params = {
         s: String(startDate.getTime()),
         e: String(endDate.getTime()),
-        u: sessionStorage.getItem("userId"),
+        supervisor: sessionStorage.getItem("userId"),
       };
 
-      const response = await AxiosConfig.get("/api/v1/usage/history", {
-        params,
-      });
+      const response = await AxiosConfig.get(
+        "/api/v1/usage/supervisor/history",
+        {
+          params,
+        }
+      );
 
       const data = response.data;
-      console.log(data);
+      setRawData(data);
 
-      // Build pairs of timestamp and value, filtering invalid entries
-      const pairs =
-        Array.isArray(data.X) && Array.isArray(data.Y)
-          ? (data.X.map((xStr: string, i: number) => {
-              // Convert 'dd:MM:yy' into timestamp
-              const [day, month, year] = xStr.split(":").map(Number);
-              const fullYear = 2000 + year; // Assumes '25' -> 2025
-              const date = new Date(fullYear, month - 1, day); // JS months are 0-based
-              const time = date.getTime();
-              const val = parseFloat(data.Y[i]);
-
-              if (!isNaN(time) && !isNaN(val)) {
-                return { time, val };
-              }
-              return null;
-            }).filter(Boolean) as { time: number; val: number }[])
-          : [];
-
-      if (pairs.length === 0) {
-        setError("No valid data to display for the selected period.");
-        setChartData(null);
+      // Store the timestamps
+      if (Array.isArray(data.X)) {
+        setTimestamps(data.X);
+      } else {
+        setError("Invalid timestamp data format");
         return;
       }
 
-      const safeTimestamps = pairs.map((p) => p.time);
-      const safeValues = pairs.map((p) => p.val);
+      // Extract user IDs and their data
+      if (data.Y && typeof data.Y === "object") {
+        const ids = Object.keys(data.Y);
 
-      setChartData({
-        xAxis: safeTimestamps,
-        series: safeValues,
-      });
+        if (ids.length === 0) {
+          setError("No user data found for the selected period");
+          setChartData(null);
+          return;
+        }
+
+        // Store the user data
+        setUserData(data.Y);
+
+        // Temporary object to store user names
+        const namesMap: UserNameMap = {};
+
+        // Fetch names for all users in parallel
+        await Promise.all(
+          ids.map(async (id) => {
+            try {
+              const itemResponse = await AxiosConfig.get("/api/v1/user/name", {
+                params: { u: String(id) },
+              });
+              // Store the user name (assuming response contains name property)
+              if (itemResponse.data && itemResponse.data.name) {
+                namesMap[id] = itemResponse.data.name;
+              } else if (itemResponse.data) {
+                // If the response structure is different
+                namesMap[id] = String(itemResponse.data);
+              } else {
+                // Fallback to ID if name not available
+                namesMap[id] = `User ${id.substring(0, 8)}...`;
+              }
+            } catch (error) {
+              console.error(`Error fetching name for user ${id}:`, error);
+              namesMap[id] = `User ${id.substring(0, 8)}...`;
+            }
+          })
+        );
+
+        // Update state with user names
+        setUserNames(namesMap);
+
+        // Select first user by default if none selected
+        const userToSelect = filters.selectedUserId || ids[0];
+        if (userToSelect) {
+          setFilters((prev) => ({ ...prev, selectedUserId: userToSelect }));
+          // Update chart for selected user
+          updateChartForUser(userToSelect);
+        }
+      } else {
+        setError("Invalid user data format");
+      }
     } catch (err: any) {
       console.error("Error fetching chart data:", err);
 
@@ -187,6 +280,7 @@ export default function SingleUserChart() {
 
   useEffect(() => {
     fetchChartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -206,6 +300,26 @@ export default function SingleUserChart() {
               <MenuItem value="month">Monthly</MenuItem>
               <MenuItem value="year">Yearly</MenuItem>
               <MenuItem value="custom">Custom Range</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* User selection dropdown */}
+        <Grid item xs={12} md={3}>
+          <FormControl fullWidth>
+            <InputLabel>Select User</InputLabel>
+            <Select
+              name="selectedUserId"
+              value={filters.selectedUserId || ""}
+              label="Select User"
+              onChange={handleFilterChange}
+              disabled={Object.keys(userNames).length === 0}
+            >
+              {Object.entries(userNames).map(([id, name]) => (
+                <MenuItem key={id} value={id}>
+                  {name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -314,7 +428,7 @@ export default function SingleUserChart() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            height: 300,
+            height: "20vh",
           }}
         >
           <Typography color="error">{error}</Typography>
@@ -331,9 +445,31 @@ export default function SingleUserChart() {
                 new Date(timestamp).toLocaleDateString(),
             },
           ]}
-          series={[{ data: chartData.series, label: "Power Usage (kWh)" }]}
+          series={[
+            {
+              data: chartData.series,
+              label: `Power Usage (kWh) - ${
+                userNames[filters.selectedUserId || ""]
+              }`,
+              color: "var(--color-tertiary)",
+              // Set proper marker properties
+              valueFormatter: (value) => `${value} kWh`,
+              showMark: true,
+              // Change the marker styling to fix positioning
+              marker: { size: 6 },
+            },
+          ]}
           height={300}
-          width={500}
+          sx={{
+            ".MuiLineElement-root": {
+              strokeWidth: 2,
+            },
+            // Fix marker positioning - remove the scale property
+            ".MuiMarkElement-root": {
+              stroke: "var(--color-secondary)",
+              fill: "var(--color-secondary)",
+            },
+          }}
         />
       ) : (
         <Box
@@ -344,7 +480,11 @@ export default function SingleUserChart() {
             height: 300,
           }}
         >
-          <Typography>No data to display.</Typography>
+          <Typography>
+            {Object.keys(userNames).length > 0
+              ? "Select a user to view their power usage data"
+              : "No data available for the selected period"}
+          </Typography>
         </Box>
       )}
     </Box>

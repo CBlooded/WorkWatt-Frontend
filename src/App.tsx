@@ -10,32 +10,38 @@ import { Route, Routes, BrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterForm from "./components/RegisterForm";
 import LoginPage from "./pages/LoginPage";
-
+import { useEffect } from "react";
 import RegisterUser from "./components/RegisterUserConfirmation";
-import SingleUserChart from './components/SingleUserChart'
-
+import SingleUserChart from "./components/SingleUserChart";
+import RegisterUserConfirmation from "./components/RegisterUserConfirmation";
+import Dashboard from "./pages/dashboards";
+import SetupInterceptors from "./api/SetupInterceptors";
 
 function App() {
-  const role = 0;
-  const token = "abc"
-  sessionStorage.setItem('token',token)
-  sessionStorage.setItem("role", String(role));
+  useEffect(() => {
+    SetupInterceptors();
+  }, []);
+
   return (
     <>
       <div className="app">
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LoginPage />} />
-
-            <Route path="/account/confirm" element={<RegisterUser />} />
+            <Route
+              path="/account/confirm?/*"
+              element={<RegisterUserConfirmation />}
+            />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/account/register" element={<RegisterForm />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/tempRegister" />
-              <Route path="/register" element={<RegisterForm />} />
-              <Route path="/dashboard" />
+              <Route path="/dashboard" element={<Dashboard />} />
             </Route>
           </Routes>
         </BrowserRouter>
       </div>
+      {/* <SingleUserChart /> */}
     </>
   );
 }

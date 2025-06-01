@@ -1,7 +1,8 @@
 import { TextField, Button, Box, InputLabel } from "@mui/material";
 import { useForm } from "react-hook-form";
 import AxiosConfig from "../api/AxiosConfig";
-//import { useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import JwtDecode from "../services/JwtDecode";
 
 type LoginTypes = {
   email: string;
@@ -9,7 +10,7 @@ type LoginTypes = {
 };
 
 const LoginForm = () => {
-  //const Navigate = useNavigate();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -18,14 +19,35 @@ const LoginForm = () => {
 
   const onSubmit = async (data: LoginTypes) => {
     try {
+      console.log(data);
       const response = await AxiosConfig.post(
         "/api/v1/auth/authenticate",
         data
       );
       const token = response.data.token;
+      console.log(token);
+
       if (token) {
+        const decodedToken = JwtDecode(token);
+        console.log(decodedToken);
         sessionStorage.setItem("token", token);
+        sessionStorage.setItem("userId", decodedToken.id);
+        switch (decodedToken.Role) {
+          case "EMPLOYEE":
+            sessionStorage.setItem("role", "2");
+            break;
+          case "MANAGER":
+            sessionStorage.setItem("role", "1");
+            break;
+          case "DIRECTOR":
+            sessionStorage.setItem("role", "0");
+            break;
+          default:
+            console.warn("Unknown role:", decodedToken.role);
+            break;
+        }
       }
+      navigate("/dashboard");
     } catch (error) {
       console.error("An error occurred during login:", error);
     }
